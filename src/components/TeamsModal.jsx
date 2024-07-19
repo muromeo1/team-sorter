@@ -10,19 +10,24 @@ export default function TeamsModal({ teams }) {
           </button>
         </form>
 
-        <h3 className="font-bold text-lg">Times</h3>
+        <h3 className="font-bold text-lg text-primary text-center mb-5">
+          Times
+        </h3>
 
         {teams &&
           teams.map((team, index) => (
             <div key={index} className="mb-5">
-              <p>
-                Goleiro: {team.goalkeeper.name} - Skill: {team.goalkeeper.skill}
-              </p>
+              <p className="font-bold mb-5 text-center">Time {index + 1}</p>
+
+              {team.goalkeeper && (
+                <p className="mb-2">Goleiro: {team.goalkeeper.name}</p>
+              )}
 
               <FieldPlayers players={team.fieldPlayers} />
 
-              <p className="mt-2">
-                Nota do time: {team.totalSkill / (team.fieldPlayers.length + 1)}
+              <p className="mt-3">
+                Ranking do time:{" "}
+                {(team.totalSkill / (team.fieldPlayers.length + 1)).toFixed(1)}
               </p>
             </div>
           ))}
@@ -34,8 +39,7 @@ export default function TeamsModal({ teams }) {
 const FieldPlayers = ({ players }) => {
   return players.map((player, index) => (
     <div key={index} className="flex flex-row gap-1">
-      <p>Jogador: {player.name}</p>
-      <p>- Skill: {player.skill}</p>
+      <p>{player.name}</p>
     </div>
   ));
 };
