@@ -12,10 +12,22 @@ export default function PlayersSelection({
 
   const SELECTED_PLAYERS_LIMIT = withGoalkeepers ? 12 : 10;
 
+  const initialPlayers = withGoalkeepers
+    ? players
+    : players.filter((player) => !player.goalkeeper);
+
   const reachLimit = selectedPlayers.length >= SELECTED_PLAYERS_LIMIT;
+
+  const [playersList, setPlayersList] = useState(initialPlayers);
+
   const goalkeepersCount = selectedPlayers.filter(
     (player) => player?.goalkeeper,
   ).length;
+
+  const teams = distributeTeams({
+    selectedPlayers,
+    limit: SELECTED_PLAYERS_LIMIT,
+  });
 
   const isSelected = (player) => {
     return selectedPlayers.some((selected) => selected.name === player.name);
@@ -39,21 +51,27 @@ export default function PlayersSelection({
     setSelectedPlayers([...selectedPlayers, player]);
   };
 
-  const listPlayers = withGoalkeepers
-    ? players
-    : players.filter((player) => !player.goalkeeper);
+  const searchPlayers = (name) => {
+    if (!name) setPlayersList(initialPlayers);
 
-  const teams = distributeTeams({
-    selectedPlayers,
-    limit: SELECTED_PLAYERS_LIMIT,
-  });
+    setPlayersList(
+      initialPlayers.filter((player) =>
+        player.name
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^\w\s]/gi, "")
+          .includes(name.toLowerCase()),
+      ),
+    );
+  };
 
   return (
     <>
       <TeamsModal teams={teams} />
 
       <div className="w-full h-full lg:w-2/6 lg:m-auto">
-        <div className="card bg-base-100 shadow-xl h-full">
+        <div className="card h-full">
           <div className="card-body">
             <div className="py-4 bg-base-100 sticky top-0">
               <h2 className="card-title">Selecione os jogadores</h2>
@@ -98,10 +116,30 @@ export default function PlayersSelection({
                     </button>
                   )}
               </div>
+
+              <div className="flex gap-2 w-full mb-4">
+                <input
+                  id="search-player-input"
+                  type="text"
+                  placeholder="Pesquisar..."
+                  className="input input-bordered w-full"
+                  onChange={(e) => searchPlayers(e.target.value)}
+                />
+
+                <button
+                  className="btn"
+                  onClick={() => {
+                    setPlayersList(initialPlayers);
+                    document.getElementById("search-player-input").value = "";
+                  }}
+                >
+                  X
+                </button>
+              </div>
             </div>
 
             <div className="flex flex-col gap-4 mb-4">
-              {listPlayers.map((player, index) => (
+              {playersList.map((player, index) => (
                 <button
                   className={`${isSelected(player) && (player.goalkeeper ? "btn-accent" : "btn-primary")} btn btn-lg`}
                   onClick={() => onClick(player)}
