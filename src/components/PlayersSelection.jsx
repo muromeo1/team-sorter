@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import TeamsModal from "./TeamsModal";
 import distributeTeams from "../utils/distribute_teams";
@@ -66,6 +66,10 @@ export default function PlayersSelection({
     );
   };
 
+  useEffect(() => {
+    setPlayersList(initialPlayers);
+  }, [withGoalkeepers]);
+
   return (
     <>
       <TeamsModal teams={teams} />
@@ -84,6 +88,7 @@ export default function PlayersSelection({
                   onChange={() => {
                     setWithGoalkeepers(!withGoalkeepers);
                     setSelectedPlayers([]);
+                    document.getElementById("search-player-input").value = "";
                   }}
                 />
               </div>
